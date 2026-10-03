@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthProvider";
 import { baseurl } from "../services/BaseUrl";
@@ -8,6 +8,30 @@ const Hero = () => {
     const { authUser } = useContext(AuthContext)
     const [happyCoustomer, setHappyCoustomer] = useState(0)
     const [delivered, setDelivered] = useState(0)
+    const carouselRef = useRef(null);
+
+    const goToSlide = (slideId) => {
+        const slide = document.getElementById(slideId);
+
+        if (slide && carouselRef.current) {
+            carouselRef.current.scrollTo({
+                left: slide.offsetLeft,
+                behavior: "smooth",
+            });
+        }
+    };
+
+    useEffect(() => {
+        const slides = ["slide1", "slide2", "slide3", "slide4"];
+        let currentSlide = 0;
+
+        const interval = setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            goToSlide(slides[currentSlide]);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const handleGetStarted = () => {
         navigate("/login")
@@ -24,7 +48,8 @@ const Hero = () => {
 
     return (
         <div>
-            <div className="carousel w-full">
+            <div ref={carouselRef} className="carousel w-full">
+
                 {/* Slide 1 */}
                 <div id="slide1" className="carousel-item relative w-full min-h-[65vh] sm:min-h-[70vh] md:min-h-[75vh] lg:min-h-[85vh]">
                     {/* Background Image */}
@@ -84,8 +109,19 @@ const Hero = () => {
 
                     {/* Slider Navigation Arrows */}
                     <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
-                        <a href="#slide4" className="btn btn-circle">❮</a>
-                        <a href="#slide2" className="btn btn-circle">❯</a>
+                        <button
+                            onClick={() => goToSlide("slide4")}
+                            className="btn btn-circle"
+                        >
+                            ❮
+                        </button>
+
+                        <button
+                            onClick={() => goToSlide("slide2")}
+                            className="btn btn-circle"
+                        >
+                            ❯
+                        </button>
                     </div>
                 </div>
 
@@ -108,8 +144,19 @@ const Hero = () => {
                     </div>
 
                     <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
-                        <a href="#slide1" className="btn btn-circle">❮</a>
-                        <a href="#slide3" className="btn btn-circle">❯</a>
+                        <button
+                            onClick={() => goToSlide("slide1")}
+                            className="btn btn-circle"
+                        >
+                            ❮
+                        </button>
+
+                        <button
+                            onClick={() => goToSlide("slide3")}
+                            className="btn btn-circle"
+                        >
+                            ❯
+                        </button>
                     </div>
                 </div>
 
@@ -132,8 +179,19 @@ const Hero = () => {
                     </div>
 
                     <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
-                        <a href="#slide2" className="btn btn-circle">❮</a>
-                        <a href="#slide4" className="btn btn-circle">❯</a>
+                        <button
+                            onClick={() => goToSlide("slide2")}
+                            className="btn btn-circle"
+                        >
+                            ❮
+                        </button>
+
+                        <button
+                            onClick={() => goToSlide("slide4")}
+                            className="btn btn-circle"
+                        >
+                            ❯
+                        </button>
                     </div>
                 </div>
 
@@ -156,8 +214,19 @@ const Hero = () => {
                     </div>
 
                     <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
-                        <a href="#slide3" className="btn btn-circle">❮</a>
-                        <a href="#slide1" className="btn btn-circle">❯</a>
+                        <button
+                            onClick={() => goToSlide("slide3")}
+                            className="btn btn-circle"
+                        >
+                            ❮
+                        </button>
+
+                        <button
+                            onClick={() => goToSlide("slide1")}
+                            className="btn btn-circle"
+                        >
+                            ❯
+                        </button>
                     </div>
                 </div>
             </div>
