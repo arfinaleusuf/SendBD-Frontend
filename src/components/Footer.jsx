@@ -50,7 +50,7 @@ const Footer = () => {
                     </div>
                 </nav>
                 <aside>
-                    <p>Copyright © {new Date().getFullYear()} - All right reserved by Bangladesh Courier Service</p>
+                    <p>Copyright © {new Date().getFullYear()} - All right reserved by <strong>Arfin Al Eusuf</strong></p>
                 </aside>
             </footer>
         </div>

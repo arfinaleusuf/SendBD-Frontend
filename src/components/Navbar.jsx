@@ -6,7 +6,7 @@ const Navbar = () => {
     const { authUser, logout } = useContext(AuthContext)
 
     return (
-        <div className="sticky top-0 z-50 w-full bg-base-100 shadow-sm">
+        <div className="sticky top-0 z-100 w-full bg-base-100 shadow-sm">
             <div className="navbar bg-base-100/95 backdrop-blur-md shadow-md border-b border-base-200 px-3 md:px-6 lg:px-10 sticky top-0 z-50">
 
                 <div className="navbar-start">
