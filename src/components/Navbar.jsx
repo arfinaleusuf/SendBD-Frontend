@@ -70,7 +70,7 @@ const Navbar = () => {
                         to={'/'}
                         className="btn btn-ghost hover:bg-transparent px-2"
                     >
-                        <img src="./image/logo.png" alt="" className="h-7 md:h-8 lg:h-10"/>
+                        <img src="./image/logo.png" alt="" className="h-7 md:h-8 lg:h-10" />
                         <p className="text-base md:text-xl lg:text-2xl font-bold tracking-tight">
                             <span className="text-primary">Send</span>BD
                         </p>
@@ -78,12 +78,12 @@ const Navbar = () => {
                 </div>
 
                 <div className="navbar-center hidden lg:flex">
-                    <ul className="menu menu-horizontal gap-1 px-1 font-medium">
+                    <ul className="menu menu-vertical lg:menu-horizontal bg- rounded-box">
 
                         <li>
                             <Link
                                 to={'/'}
-                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200"
+                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-7 mx-2"
                             >
                                 Home
                             </Link>
@@ -92,7 +92,7 @@ const Navbar = () => {
                         <li>
                             <Link
                                 to={'/create-courier'}
-                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200"
+                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-7 mx-2"
                             >
                                 Send Courier
                             </Link>
@@ -101,7 +101,7 @@ const Navbar = () => {
                         <li>
                             <Link
                                 to={'/view-all-couriers'}
-                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200"
+                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-7 mx-2"
                             >
                                 View My Couriers
                             </Link>
@@ -207,11 +207,14 @@ const Navbar = () => {
                                 </ul>
                             </div>
                             :
-                            <Link
-                                to={"/login"}
-                                className="btn btn-primary rounded-xl px-5 shadow-md hover:shadow-lg transition-all duration-200"
-                            >
-                                Login
+                            <Link to={"/login"}>
+                                <div className="aura text-blue-600 bg-blue-200">
+                                    <div className="card bg-base-100 text-base-content">
+                                        <div className="card-body px-4 py-1.5 flex items-center justify-center">
+                                            <p className="text-xl font-bold leading-none">Login</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </Link>
                     }
                 </div>
