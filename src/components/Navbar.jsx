@@ -78,12 +78,12 @@ const Navbar = () => {
                 </div>
 
                 <div className="navbar-center hidden lg:flex">
-                    <ul className="menu menu-vertical lg:menu-horizontal bg- rounded-box">
+                    <ul className="menu menu-vertical lg:menu-horizontal bg-base-200 rounded-box">
 
                         <li>
                             <Link
                                 to={'/'}
-                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-7 mx-2"
+                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-2 mx-1"
                             >
                                 Home
                             </Link>
@@ -92,7 +92,7 @@ const Navbar = () => {
                         <li>
                             <Link
                                 to={'/create-courier'}
-                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-7 mx-2"
+                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-2 mx-1"
                             >
                                 Send Courier
                             </Link>
@@ -101,7 +101,7 @@ const Navbar = () => {
                         <li>
                             <Link
                                 to={'/view-all-couriers'}
-                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-7 mx-2"
+                                className="rounded-xl hover:bg-primary hover:text-primary-content transition-all duration-200 px-2 mx-1"
                             >
                                 View My Couriers
                             </Link>
