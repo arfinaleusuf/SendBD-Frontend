@@ -5,13 +5,14 @@ import toast from "react-hot-toast";
 
 const UserProfile = () => {
 
-    const { authUser, accessToken} = useContext(AuthContext);
+    const { authUser, accessToken } = useContext(AuthContext);
 
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
+    const [img, setImg] = useState("");
 
     useEffect(() => {
 
@@ -20,6 +21,7 @@ const UserProfile = () => {
             setLastName(authUser.lastname || "");
             setUserName(authUser.username || "");
             setEmail(authUser.email || "");
+            setImg(authUser.img_url || "");
         }
     }, [authUser]);
 
@@ -54,6 +56,9 @@ const UserProfile = () => {
 
                     {/* Profile Header */}
                     <div className="text-center mb-6">
+                        <div className="flex justify-center py-5">
+                            <img className="rounded-full border-2 shadow-2xl w-50" src={img} alt="" />
+                        </div>
                         <h2 className="text-3xl font-bold">
                             My Profile
                         </h2>
