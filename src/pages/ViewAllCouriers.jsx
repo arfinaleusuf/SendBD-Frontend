@@ -62,7 +62,7 @@ const ViewAllCouriers = () => {
     return (
         <div className="min-h-screen bg-base-200 px-4 py-8 md:px-8">
 
-            <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-7xl mt-15">
 
                 <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 

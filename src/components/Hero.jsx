@@ -65,23 +65,6 @@ const Hero = () => {
                     {/* Hero Content */}
                     <div className="hero-content relative z-10 mx-auto flex h-full w-full items-center justify-center px-4 py-10 text-center text-neutral-content sm:px-6 md:px-8 lg:px-12">
                         <div className="w-full max-w-3xl">
-                            <div className="flex contain-content justify-center">
-                                <div className="hover-3d p-5">
-                                    {/* content */}
-                                    <figure className="max-w-100 rounded-2xl">
-                                        <img src="./image/logo.png" alt="3D card" />
-                                    </figure>
-                                    {/* 8 empty divs needed for the 3D effect */}
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                            </div>
 
                             <h1 className="mb-4 text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
                                 Send Anything.

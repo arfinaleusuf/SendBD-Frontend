@@ -74,7 +74,7 @@ const SendCourier = () => {
     return (
         <div className="min-h-screen bg-base-200 px-4 py-10 md:px-8">
 
-            <div className="mx-auto max-w-4xl">
+            <div className="mx-auto max-w-4xl mt-12">
 
                 <div className="mb-8 text-center">
 

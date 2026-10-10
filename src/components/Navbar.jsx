@@ -91,8 +91,8 @@ const Navbar = () => {
                             className="h-7 sm:h-8 lg:h-9"
                         />
 
-                        <p className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight">
-                            <span className="text-primary">Send</span>BD
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight flex">
+                            <span className="text-primary">Send</span> <p className={`${isScrolled? 'text-black' : 'text-white'}`}>BD</p>
                         </p>
                     </Link>
                 </div>
@@ -138,7 +138,7 @@ const Navbar = () => {
                             <div
                                 tabIndex={0}
                                 role="button"
-                                className="btn btn-ghost rounded-xl gap-2 px-2 sm:px-3 hover:bg-primary/10"
+                                className={`btn btn-ghost rounded-xl gap-2 px-2 sm:px-3 hover:bg-primary/10 ${isScrolled? 'text-black' : 'text-white'}`}
                             >
                                 <div className="flex items-center gap-2">
 
@@ -154,7 +154,7 @@ const Navbar = () => {
                                         </div>
                                     </div>
 
-                                    <span className="hidden sm:block font-semibold max-w-[120px] truncate">
+                                    <span className={`hidden sm:block font-semibold max-w-[120px] truncate`}>
                                         {authUser?.username}
                                     </span>
                                 </div>
