@@ -9,12 +9,22 @@ const AuthProvider = ({ children }) => {
 
     const accessToken = localStorage.getItem('access_token')
 
+    const logout = () => {
+        localStorage.removeItem('access_token')
+        setAuthUser(null)
+    }
+
     const fetchUser = async () => {
         const userRes = await fetch(`${baseurl}/user`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
+
+        if (userRes.status === 401 || !userRes.ok) {
+            logout();
+            return;
+        }
 
         const userData = await userRes.json();
 
@@ -31,13 +41,9 @@ const AuthProvider = ({ children }) => {
         fetchUser();
     }, [accessToken])
 
-    const logout = () =>{
-        localStorage.removeItem('access_token')
-        setAuthUser(null)
-    }
 
     return (
-        <AuthContext.Provider value={{ authUser, setAuthUser, logout, accessToken, loading}}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ authUser, setAuthUser, logout, accessToken, loading }}>{children}</AuthContext.Provider>
     );
 };
 
