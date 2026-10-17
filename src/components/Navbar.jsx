@@ -24,7 +24,7 @@ const Navbar = () => {
     return (
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                ? 'glass-nav shadow-lg bg-white/85 dark:bg-slate-950/90 border-b border-slate-200/80 dark:border-slate-800/80 py-3'
+                ? 'glass-nav shadow-lg bg-white/85 dark:bg-slate-950/90 py-3'
                 : 'bg-transparent py-5'
                 }`}
         >
