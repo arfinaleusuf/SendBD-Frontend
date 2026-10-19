@@ -117,10 +117,7 @@ const Hero = () => {
                 <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-6">
                     
                     {/* Eyebrow Badge */}
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs sm:text-sm font-semibold backdrop-blur-md">
-                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                        <span>SendBD Express Logistics</span>
-                    </div>
+                    
 
                     {/* Headline */}
                     <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-tight sm:leading-tight tracking-tight text-white drop-shadow-md">
