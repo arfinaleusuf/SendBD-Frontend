@@ -1,447 +1,418 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthProvider";
 import { baseurl } from "../services/BaseUrl";
+import { 
+    FaBox, 
+    FaShieldAlt, 
+    FaUsers, 
+    FaStar, 
+    FaMotorcycle, 
+    FaRoute,
+    FaChevronLeft,
+    FaChevronRight,
+    FaMapMarkedAlt,
+    FaArrowRight
+} from "react-icons/fa";
 
 const Hero = () => {
     const navigate = useNavigate();
-    const { authUser } = useContext(AuthContext)
-    const [happyCoustomer, setHappyCoustomer] = useState(0)
-    const [delivered, setDelivered] = useState(0)
-    const carouselRef = useRef(null);
+    const { authUser } = useContext(AuthContext);
+    const [happyCoustomer, setHappyCoustomer] = useState(1280);
+    const [delivered, setDelivered] = useState(3450);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
-    const goToSlide = (slideId) => {
-        const slide = document.getElementById(slideId);
+    const slides = [
+        {
+            id: "slide1",
+            image: "https://img.magnific.com/free-psd/3d-rendering-delivery-sales-blank-banner_23-2151558571.jpg?semt=ais_hybrid&w=740&q=80",
+            title: "Send Anything.",
+            highlight: "Anywhere, Anytime.",
+            description: "Send your parcels quickly and securely with our reliable courier service. Track your delivery, manage shipments, and enjoy hassle-free delivery from pickup to destination.",
+        },
+        {
+            id: "slide2",
+            image: "./image/hero-2.jpg",
+            title: "Fast Delivery Around",
+            highlight: "Bangladesh",
+            description: "Reach customers across borders with simple, safe, and secured shipping workflows throughout all 64 districts.",
+        },
+        {
+            id: "slide3",
+            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeTOCmt9Ur_BA7djuX_6LesRax6Hpns4LnmjRl0CRx2a4JX7k8VgsDSBr9&s=10",
+            title: "Track Every Step",
+            highlight: "In Real Time",
+            description: "Live real-time updates directly on your dashboard. Stay informed every step from dispatch to doorstep delivery.",
+        },
+        {
+            id: "slide4",
+            image: "./image/hero-4.jpg",
+            title: "Safe & Secure",
+            highlight: "Handling",
+            description: "Guaranteed protection for fragile and critical parcel items with verified riders and tamper-proof security.",
+        },
+    ];
 
-        if (slide && carouselRef.current) {
-            carouselRef.current.scrollTo({
-                left: slide.offsetLeft,
-                behavior: "smooth",
-            });
-        }
-    };
-
+    // Auto rotate slides every 5 seconds
     useEffect(() => {
-        const slides = ["slide1", "slide2", "slide3", "slide4"];
-        let currentSlide = 0;
-
         const interval = setInterval(() => {
-            currentSlide = (currentSlide + 1) % slides.length;
-            goToSlide(slides[currentSlide]);
+            setCurrentSlide((prev) => (prev + 1) % slides.length);
         }, 5000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [slides.length]);
 
-    const handleGetStarted = () => {
-        navigate("/login")
-    }
+    const prevSlide = () => {
+        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    };
 
+    const nextSlide = () => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+    };
+
+    // Fetch stats from backend
     useEffect(() => {
         fetch(`${baseurl}/home-info`)
-            .then(res => res.json())
-            .then(data => {
-                setDelivered(data.delivered)
-                setHappyCoustomer(data.happyCoustomer)
+            .then((res) => {
+                if (!res.ok) throw new Error("Network response was not ok");
+                return res.json();
             })
-    }, [])
+            .then((data) => {
+                if (data.delivered !== undefined) setDelivered(data.delivered);
+                if (data.happyCoustomer !== undefined) setHappyCoustomer(data.happyCoustomer);
+            })
+            .catch((err) => {
+                console.log("Stats fetch fallback:", err);
+            });
+    }, []);
+
+    const activeSlideData = slides[currentSlide];
 
     return (
-        <div>
-            <div ref={carouselRef} className="carousel w-full">
+        <div className="w-full overflow-hidden bg-slate-50">
+            
+            {/* ================= HERO SLIDER SECTION ================= */}
+            <div className="relative w-full min-h-[75vh] sm:min-h-[80vh] md:min-h-[85vh] lg:min-h-[88vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white select-none">
+                
+                {/* Background Slider Images with Smooth Crossfade */}
+                {slides.map((slide, idx) => (
+                    <div
+                        key={slide.id}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                            idx === currentSlide ? "opacity-100 z-0 scale-100" : "opacity-0 pointer-events-none scale-105"
+                        } transition-transform duration-1000`}
+                    >
+                        <img
+                            src={slide.image}
+                            alt={slide.title}
+                            className="h-full w-full object-cover object-center"
+                        />
+                    </div>
+                ))}
 
-                {/* Slide 1 */}
-                <div id="slide1" className="carousel-item relative w-full min-h-[65vh] sm:min-h-[70vh] md:min-h-[75vh] lg:min-h-[85vh]">
-                    {/* Background Image */}
-                    <img
-                        alt="Slide 1"
-                        src="https://img.magnific.com/free-psd/3d-rendering-delivery-sales-blank-banner_23-2151558571.jpg?semt=ais_hybrid&w=740&q=80"
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
+                {/* Dark Gradient Overlay for Maximum Legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-black/65 to-black/60 z-10"></div>
 
-                    {/* Dark Overlay */}
-                    <div className="absolute inset-0 bg-black/55"></div>
-
-                    {/* Hero Content */}
-                    <div className="hero-content relative z-10 mx-auto flex h-full w-full items-center justify-center px-4 py-10 text-center text-neutral-content sm:px-6 md:px-8 lg:px-12">
-                        <div className="w-full max-w-3xl">
-
-                            <h1 className="mb-4 text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-                                Send Anything.
-                                <br />
-                                <span className="text-primary">Anywhere, Anytime.</span>
-                            </h1>
-
-                            <p className="mx-auto mb-6 max-w-2xl text-sm leading-6 text-gray-200 sm:mb-7 sm:text-base sm:leading-7 md:mb-8 md:text-lg md:leading-8 lg:text-xl">
-                                Send your parcels quickly and securely with our reliable courier service. Track your delivery,
-                                manage shipments, and enjoy hassle-free delivery from pickup to destination.
-                            </p>
-
-                            {!authUser && (
-                                <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-                                    <button
-                                        onClick={handleGetStarted}
-                                        className="btn btn-primary w-full px-7 sm:w-auto sm:px-8 md:px-10"
-                                    >
-                                        Get Started
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                {/* Slider Content */}
+                <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-6">
+                    
+                    {/* Eyebrow Badge */}
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs sm:text-sm font-semibold backdrop-blur-md">
+                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                        <span>SendBD Express Logistics</span>
                     </div>
 
-                    {/* Slider Navigation Arrows */}
-                    <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
+                    {/* Headline */}
+                    <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-tight sm:leading-tight tracking-tight text-white drop-shadow-md">
+                        {activeSlideData.title}{" "}
+                        <br className="hidden sm:inline" />
+                        <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-300 bg-clip-text text-transparent">
+                            {activeSlideData.highlight}
+                        </span>
+                    </h1>
+
+                    {/* Description */}
+                    <p className="mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed font-normal drop-shadow">
+                        {activeSlideData.description}
+                    </p>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                         <button
-                            onClick={() => goToSlide("slide4")}
-                            className="btn btn-circle"
+                            onClick={() => navigate(authUser ? "/create-courier" : "/login")}
+                            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm sm:text-base shadow-xl shadow-blue-500/30 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
-                            ❮
+                            <FaBox />
+                            <span>{authUser ? "Send Courier" : "Get Started"}</span>
                         </button>
 
                         <button
-                            onClick={() => goToSlide("slide2")}
-                            className="btn btn-circle"
+                            onClick={() => navigate(authUser ? "/view-all-couriers" : "/login")}
+                            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm sm:text-base border border-white/20 backdrop-blur-md transition-all flex items-center justify-center gap-2"
                         >
-                            ❯
+                            <FaRoute className="text-blue-400" />
+                            <span>Track Parcel</span>
                         </button>
                     </div>
+
                 </div>
 
-                {/* Slide 2 */}
-                <div id="slide2" className="carousel-item relative w-full min-h-[65vh] sm:min-h-[70vh] md:min-h-[75vh] lg:min-h-[85vh]">
-                    <img
-                        alt="Slide 2"
-                        src="./image/hero-2.jpg"
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/55"></div>
+                {/* Slider Navigation Arrows */}
+                <button
+                    onClick={prevSlide}
+                    aria-label="Previous slide"
+                    className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-blue-600 text-white border border-white/20 hover:border-blue-500 backdrop-blur-md flex items-center justify-center transition-all shadow-lg active:scale-90"
+                >
+                    <FaChevronLeft className="text-base" />
+                </button>
 
-                    <div className="hero-content relative z-10 mx-auto flex h-full w-full items-center justify-center px-4 py-10 text-center text-neutral-content">
-                        <div className="w-full max-w-3xl">
-                            <h1 className="mb-4 text-3xl font-extrabold sm:text-5xl">Fast Delivery Around Bangladesh</h1>
-                            <p className="mx-auto mb-6 max-w-2xl text-sm text-gray-200 sm:text-base">
-                                Reach customers across borders with simple, safe, and secured shipping workflows.
-                            </p>
-                        </div>
-                    </div>
+                <button
+                    onClick={nextSlide}
+                    aria-label="Next slide"
+                    className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-blue-600 text-white border border-white/20 hover:border-blue-500 backdrop-blur-md flex items-center justify-center transition-all shadow-lg active:scale-90"
+                >
+                    <FaChevronRight className="text-base" />
+                </button>
 
-                    <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
+                {/* Slider Dot Indicator Pills */}
+                <div className="absolute bottom-6 left-0 right-0 z-30 flex items-center justify-center gap-2.5">
+                    {slides.map((_, idx) => (
                         <button
-                            onClick={() => goToSlide("slide1")}
-                            className="btn btn-circle"
-                        >
-                            ❮
-                        </button>
-
-                        <button
-                            onClick={() => goToSlide("slide3")}
-                            className="btn btn-circle"
-                        >
-                            ❯
-                        </button>
-                    </div>
+                            key={idx}
+                            onClick={() => setCurrentSlide(idx)}
+                            aria-label={`Go to slide ${idx + 1}`}
+                            className={`h-2.5 rounded-full transition-all duration-300 ${
+                                idx === currentSlide
+                                    ? "w-8 bg-blue-500 shadow-md shadow-blue-500/50"
+                                    : "w-2.5 bg-white/40 hover:bg-white/70"
+                            }`}
+                        />
+                    ))}
                 </div>
-
-                {/* Slide 3 */}
-                <div id="slide3" className="carousel-item relative w-full min-h-[65vh] sm:min-h-[70vh] md:min-h-[75vh] lg:min-h-[85vh]">
-                    <img
-                        alt="Slide 3"
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeTOCmt9Ur_BA7djuX_6LesRax6Hpns4LnmjRl0CRx2a4JX7k8VgsDSBr9&s=10"
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/55"></div>
-
-                    <div className="hero-content relative z-10 mx-auto flex h-full w-full items-center justify-center px-4 py-10 text-center text-neutral-content">
-                        <div className="w-full max-w-3xl">
-                            <h1 className="mb-4 text-3xl font-extrabold sm:text-5xl">Track Every Step</h1>
-                            <p className="mx-auto mb-6 max-w-2xl text-sm text-gray-200 sm:text-base">
-                                Live real-time updates directly on your dashboard.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
-                        <button
-                            onClick={() => goToSlide("slide2")}
-                            className="btn btn-circle"
-                        >
-                            ❮
-                        </button>
-
-                        <button
-                            onClick={() => goToSlide("slide4")}
-                            className="btn btn-circle"
-                        >
-                            ❯
-                        </button>
-                    </div>
-                </div>
-
-                {/* Slide 4 */}
-                <div id="slide4" className="carousel-item relative w-full min-h-[65vh] sm:min-h-[70vh] md:min-h-[75vh] lg:min-h-[85vh]">
-                    <img
-                        alt="Slide 4"
-                        src="./image/hero-4.jpg"
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/55"></div>
-
-                    <div className="hero-content relative z-10 mx-auto flex h-full w-full items-center justify-center px-4 py-10 text-center text-neutral-content">
-                        <div className="w-full max-w-3xl">
-                            <h1 className="mb-4 text-3xl font-extrabold sm:text-5xl">Safe & Secure Handling</h1>
-                            <p className="mx-auto mb-6 max-w-2xl text-sm text-gray-200 sm:text-base">
-                                Guaranteed protection for fragile and critical parcel items.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="absolute left-5 right-5 top-1/2 z-20 flex -translate-y-1/2 transform justify-between">
-                        <button
-                            onClick={() => goToSlide("slide3")}
-                            className="btn btn-circle"
-                        >
-                            ❮
-                        </button>
-
-                        <button
-                            onClick={() => goToSlide("slide1")}
-                            className="btn btn-circle"
-                        >
-                            ❯
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-base-100">
-
-                {/* Stats Section */}
-                <section className="py-12 bg-base-200">
-                    <div className="max-w-6xl mx-auto px-6">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-
-                            <div>
-                                <h2 className="text-3xl font-bold text-primary">{delivered}</h2>
-                                <p className="text-gray-500 mt-2">Parcels Delivered</p>
-                            </div>
-
-                            <div>
-                                <h2 className="text-3xl font-bold text-primary">{happyCoustomer}</h2>
-                                <p className="text-gray-500 mt-2">Happy Customers</p>
-                            </div>
-
-                            <div>
-                                <h2 className="text-3xl font-bold text-primary">50+</h2>
-                                <p className="text-gray-500 mt-2">Delivery Areas</p>
-                            </div>
-
-                            <div>
-                                <h2 className="text-3xl font-bold text-primary">99%</h2>
-                                <p className="text-gray-500 mt-2">Successful Delivery</p>
-                            </div>
-
-                        </div>
-                    </div>
-                </section>
-
-
-                {/* Features */}
-                <section className="py-16">
-                    <div className="max-w-6xl mx-auto px-6">
-
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold">
-                                Why Choose Us?
-                            </h2>
-
-                            <p className="text-gray-500 mt-3">
-                                Fast, secure and reliable courier service for everyone.
-                            </p>
-                        </div>
-
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-                            {/* Feature 1 */}
-                            <div className="card bg-base-100 shadow-md hover:shadow-xl transition">
-                                <div className="card-body text-center">
-
-                                    <div className="text-5xl mb-4">
-                                        🚚
-                                    </div>
-
-                                    <h2 className="card-title justify-center">
-                                        Fast Delivery
-                                    </h2>
-
-                                    <p className="text-gray-500">
-                                        Send your parcels quickly and get them delivered
-                                        safely to their destination.
-                                    </p>
-
-                                </div>
-                            </div>
-
-
-                            {/* Feature 2 */}
-                            <div className="card bg-base-100 shadow-md hover:shadow-xl transition">
-                                <div className="card-body text-center">
-
-                                    <div className="text-5xl mb-4">
-                                        🔒
-                                    </div>
-
-                                    <h2 className="card-title justify-center">
-                                        Secure Service
-                                    </h2>
-
-                                    <p className="text-gray-500">
-                                        Your packages are handled carefully and securely
-                                        throughout the delivery process.
-                                    </p>
-
-                                </div>
-                            </div>
-
-
-                            {/* Feature 3 */}
-                            <div className="card bg-base-100 shadow-md hover:shadow-xl transition">
-                                <div className="card-body text-center">
-
-                                    <div className="text-5xl mb-4">
-                                        📍
-                                    </div>
-
-                                    <h2 className="card-title justify-center">
-                                        Easy Tracking
-                                    </h2>
-
-                                    <p className="text-gray-500">
-                                        Track your parcel and check delivery status
-                                        whenever you want.
-                                    </p>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </section>
-
-
-                {/* How It Works */}
-                <section className="py-16 bg-base-200">
-                    <div className="max-w-6xl mx-auto px-6">
-
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold">
-                                How It Works
-                            </h2>
-
-                            <p className="text-gray-500 mt-3">
-                                Send your parcel in just a few simple steps.
-                            </p>
-                        </div>
-
-
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-
-                            <div className="text-center">
-                                <div className="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold">
-                                    1
-                                </div>
-
-                                <h3 className="font-bold text-lg mt-4">
-                                    Create Account
-                                </h3>
-
-                                <p className="text-gray-500 mt-2">
-                                    Register and create your account.
-                                </p>
-                            </div>
-
-
-                            <div className="text-center">
-                                <div className="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold">
-                                    2
-                                </div>
-
-                                <h3 className="font-bold text-lg mt-4">
-                                    Book Courier
-                                </h3>
-
-                                <p className="text-gray-500 mt-2">
-                                    Provide parcel and destination details.
-                                </p>
-                            </div>
-
-
-                            <div className="text-center">
-                                <div className="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold">
-                                    3
-                                </div>
-
-                                <h3 className="font-bold text-lg mt-4">
-                                    Rider Pickup
-                                </h3>
-
-                                <p className="text-gray-500 mt-2">
-                                    Our rider collects your parcel.
-                                </p>
-                            </div>
-
-
-                            <div className="text-center">
-                                <div className="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-xl font-bold">
-                                    4
-                                </div>
-
-                                <h3 className="font-bold text-lg mt-4">
-                                    Delivered
-                                </h3>
-
-                                <p className="text-gray-500 mt-2">
-                                    Your parcel reaches its destination.
-                                </p>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </section>
-
-
-                {/* CTA */}
-                <section className="py-16">
-                    <div className="max-w-5xl mx-auto px-6">
-
-                        <div className="bg-primary text-primary-content rounded-2xl p-10 text-center">
-
-                            <h2 className="text-3xl md:text-4xl font-bold">
-                                Ready to Send Your Parcel?
-                            </h2>
-
-                            <p className="mt-4 opacity-90">
-                                Book your courier today and enjoy fast and reliable delivery.
-                            </p>
-
-
-                            <button
-                                onClick={() =>
-                                    navigate(authUser ? "/create-courier" : "/login")
-                                }
-                                className="btn btn-secondary w-full px-7 sm:w-auto sm:px-8 md:px-10 mt-5"
-                            >
-                                Send Courier
-                            </button>
-
-
-                        </div>
-
-                    </div>
-                </section>
 
             </div>
+
+            {/* ================= STATS SECTION ================= */}
+            <section className="relative -mt-8 z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    
+                    <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-all duration-300">
+                        <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                            <FaBox />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                                {Number(delivered).toLocaleString()}
+                            </h3>
+                            <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                                Parcels Delivered
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-all duration-300">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+                            <FaUsers />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                                {Number(happyCoustomer).toLocaleString()}
+                            </h3>
+                            <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                                Happy Customers
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-all duration-300">
+                        <div className="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl shrink-0">
+                            <FaMapMarkedAlt />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                                64
+                            </h3>
+                            <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                                Districts Covered
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-all duration-300">
+                        <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
+                            <FaStar />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                                99.4%
+                            </h3>
+                            <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                                Successful Delivery
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            {/* ================= FEATURES / WHY CHOOSE US ================= */}
+            <section className="py-20 lg:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider">
+                        Why Choose Us
+                    </span>
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                        Fast, Secure and Reliable Courier Service for Everyone
+                    </h2>
+                    <p className="text-base text-slate-600 leading-relaxed">
+                        Send your parcels safely and effortlessly with guaranteed care and end-to-end milestone tracking.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    {/* Feature 1 */}
+                    <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 group text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                            <FaMotorcycle />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-3">
+                            Fast Delivery
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                            Send your parcels quickly and get them delivered safely to their destination across Bangladesh.
+                        </p>
+                    </div>
+
+                    {/* Feature 2 */}
+                    <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                            <FaShieldAlt />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-3">
+                            Secure Service
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                            Your packages are handled carefully and securely throughout the entire delivery process.
+                        </p>
+                    </div>
+
+                    {/* Feature 3 */}
+                    <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-cyan-200 transition-all duration-300 group text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 group-hover:bg-cyan-600 group-hover:text-white transition-all">
+                            <FaRoute />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-3">
+                            Easy Tracking
+                        </h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                            Track your parcel and check live delivery status from your phone or desktop whenever you want.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+            {/* ================= HOW IT WORKS ================= */}
+            <section className="py-20 bg-slate-100/70 border-y border-slate-200/80">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                        <span className="px-3 py-1 rounded-full bg-cyan-100 text-cyan-800 text-xs font-bold uppercase tracking-wider">
+                            Simple Process
+                        </span>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                            How It Works
+                        </h2>
+                        <p className="text-base text-slate-600">
+                            Send your parcel in just a few simple steps.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                        
+                        {/* Step 1 */}
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 group hover:shadow-md transition-all">
+                            <div className="w-14 h-14 rounded-full bg-blue-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-blue-500/25">
+                                1
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 mb-2">
+                                Create Account
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                                Register and create your account to begin sending parcels.
+                            </p>
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 group hover:shadow-md transition-all">
+                            <div className="w-14 h-14 rounded-full bg-cyan-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-cyan-500/25">
+                                2
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 mb-2">
+                                Book Courier
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                                Provide parcel and destination details in under a minute.
+                            </p>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 group hover:shadow-md transition-all">
+                            <div className="w-14 h-14 rounded-full bg-indigo-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-indigo-500/25">
+                                3
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 mb-2">
+                                Rider Pickup
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                                Our verified rider collects your parcel directly from your doorstep.
+                            </p>
+                        </div>
+
+                        {/* Step 4 */}
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 group hover:shadow-md transition-all">
+                            <div className="w-14 h-14 rounded-full bg-emerald-600 text-white font-extrabold text-xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-emerald-500/25">
+                                4
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-900 mb-2">
+                                Delivered
+                            </h3>
+                            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                                Your parcel safely reaches its final destination on time.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            {/* ================= CALL TO ACTION SECTION ================= */}
+            <section className="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="bg-blue-600 text-white rounded-3xl p-10 sm:p-14 text-center shadow-xl space-y-4">
+                    
+                    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                        Ready to Send Your Parcel?
+                    </h2>
+
+                    <p className="max-w-xl mx-auto text-blue-100 text-sm sm:text-base leading-relaxed">
+                        Book your courier today and enjoy fast, reliable, and secure delivery across Bangladesh.
+                    </p>
+
+                    <div className="pt-4">
+                        <button
+                            onClick={() => navigate(authUser ? "/create-courier" : "/login")}
+                            className="px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 text-blue-700 font-extrabold text-sm sm:text-base shadow-lg hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2"
+                        >
+                            <FaBox className="text-blue-600" />
+                            <span>Send Courier</span>
+                            <FaArrowRight className="text-xs" />
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
         </div>
     );
 };

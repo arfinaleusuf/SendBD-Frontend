@@ -1,215 +1,278 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { baseurl } from "../services/BaseUrl";
 import toast from "react-hot-toast";
+import { 
+    FaUser, 
+    FaEnvelope, 
+    FaLock, 
+    FaCheckCircle, 
+    FaBox,
+    FaSave
+} from "react-icons/fa";
+import { Link } from "react-router";
 
 const UserProfile = () => {
+    const { authUser, accessToken, setAuthUser } = useContext(AuthContext);
 
-    const { authUser, accessToken } = useContext(AuthContext);
+    const [firstName, setFirstName] = useState(authUser?.firstname || "");
+    const [lastName, setLastName] = useState(authUser?.lastname || "");
+    const [userName, setUserName] = useState(authUser?.username || "");
+    const [email, setEmail] = useState(authUser?.email || "");
+    const [img, setImg] = useState(authUser?.img_url || "");
+    const [saving, setSaving] = useState(false);
+    const [prevUserId, setPrevUserId] = useState(authUser?.id);
 
-
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [userName, setUserName] = useState("");
-    const [email, setEmail] = useState("");
-    const [img, setImg] = useState("");
-
-    useEffect(() => {
-
-        if (authUser) {
-            setFirstName(authUser.firstname || "");
-            setLastName(authUser.lastname || "");
-            setUserName(authUser.username || "");
-            setEmail(authUser.email || "");
-            setImg(authUser.img_url || "");
-        }
-    }, [authUser]);
-
-    const handleUpdateUser = async (e) => {
-        e.preventDefault()
-
-        const formdata = {
-            firstname: firstName,
-            lastname: lastName,
-            username: userName,
-            email
-        }
-        const res = await fetch(`${baseurl}/edituser`, {
-            method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formdata)
-        })
-
-        const data = await res.json()
-
-        toast(data.message)
+    if (authUser && authUser.id !== prevUserId) {
+        setPrevUserId(authUser.id);
+        setFirstName(authUser.firstname || "");
+        setLastName(authUser.lastname || "");
+        setUserName(authUser.username || "");
+        setEmail(authUser.email || "");
+        setImg(authUser.img_url || "");
     }
 
+    const handleUpdateUser = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+
+        const formdata = {
+            firstname: firstName.trim(),
+            lastname: lastName.trim(),
+            username: userName.trim(),
+            email: email.trim(),
+        };
+
+        try {
+            const res = await fetch(`${baseurl}/edituser`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formdata),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.message || data.detail || "Failed to update profile");
+                return;
+            }
+
+            toast.success(data.message || "Profile updated successfully!");
+            // Update authUser context state
+            if (setAuthUser && authUser) {
+                setAuthUser({
+                    ...authUser,
+                    ...formdata,
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Network error while updating profile");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-base-200 flex items-center justify-center p-6">
-            <div className="card w-full max-w-2xl bg-base-100 shadow-xl">
-                <div className="card-body">
+        <div className="min-h-screen bg-slate-50 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto space-y-8">
+                
+                {/* Header */}
+                <div className="space-y-1">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Account Settings & Profile
+                    </h1>
+                    <p className="text-xs sm:text-sm text-slate-500">
+                        Manage your personal details, credentials, and review account status.
+                    </p>
+                </div>
 
-                    {/* Profile Header */}
-                    <div className="text-center mb-6">
-                        <div className="flex justify-center py-5">
-                            <img className="rounded-full border-2 shadow-2xl w-50" src={img} alt="" />
-                        </div>
-                        <h2 className="text-3xl font-bold">
-                            My Profile
-                        </h2>
-
-                        <p className="text-base-content/60">
-                            View and update your personal information
-                        </p>
+                {/* Profile Overview Card */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    <div className="relative">
+                        <img
+                            src={
+                                img ||
+                                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    userName || "User"
+                                )}&background=2563eb&color=fff&size=128`
+                            }
+                            alt={userName}
+                            className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover ring-4 ring-blue-500/10 shadow-md"
+                        />
+                        <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></span>
                     </div>
 
-                    {/* Profile Form */}
-                    <form className="space-y-4">
-
-                        {/* Email */}
-                        <div>
-                            <label className="label">
-                                <span className="label-text font-semibold">
-                                    Email
-                                </span>
-                            </label>
-
-                            <input
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                type="email"
-                                defaultValue={authUser?.email || ""}
-                                className="input input-bordered w-full"
-                                placeholder="Enter your email"
-                            />
+                    <div className="text-center sm:text-left flex-1 space-y-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                                {firstName || lastName ? `${firstName} ${lastName}` : userName}
+                            </h2>
+                            <span className="inline-block px-3 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200 self-center sm:self-auto">
+                                {authUser?.role || "Customer"}
+                            </span>
                         </div>
 
-                        {/* Username */}
-                        <div>
-                            <label className="label">
-                                <span className="label-text font-semibold">
-                                    Username
-                                </span>
-                            </label>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                            {email} • <span className="text-slate-400">@{userName}</span>
+                        </p>
 
-                            <input
-                                value={userName}
-                                onChange={(e) => setUserName(e.target.value)}
-                                type="text"
-                                defaultValue={authUser?.username || ""}
-                                className="input input-bordered w-full"
-                                placeholder="Enter your username"
-                            />
+                        <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                            <Link
+                                to="/change-password"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+                            >
+                                <FaLock className="text-slate-500 text-[10px]" />
+                                Change Password
+                            </Link>
+
+                            <Link
+                                to="/view-all-couriers"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+                            >
+                                <FaBox className="text-slate-500 text-[10px]" />
+                                My Couriers
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Edit Profile Form */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-8">
+                    <form onSubmit={handleUpdateUser} className="space-y-6">
+                        
+                        <div>
+                            <h3 className="text-base font-extrabold text-slate-900 mb-1">
+                                Personal Information
+                            </h3>
+                            <p className="text-xs text-slate-400">
+                                Update the personal details associated with your SendBD account.
+                            </p>
                         </div>
 
-                        {/* Firstname & Lastname */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        First Name
-                                    </span>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    First Name
                                 </label>
-
                                 <input
+                                    type="text"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    type="text"
-                                    defaultValue={authUser?.firstname || ""}
-                                    className="input input-bordered w-full"
-                                    placeholder="Enter first name"
+                                    placeholder="First Name"
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                 />
                             </div>
 
                             <div>
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        Last Name
-                                    </span>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    Last Name
                                 </label>
-
                                 <input
+                                    type="text"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    type="text"
-                                    defaultValue={authUser?.lastname || ""}
-                                    className="input input-bordered w-full"
-                                    placeholder="Enter last name"
+                                    placeholder="Last Name"
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                 />
                             </div>
-
                         </div>
 
-                        {/* Read Only Information */}
-                        <div className="divider">Account Information</div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        User ID
-                                    </span>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    Username
                                 </label>
-
-                                <input
-                                    type="text"
-                                    value={authUser?.id || ""}
-                                    className="input input-bordered w-full"
-                                    readOnly
-                                />
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <FaUser className="text-xs" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={userName}
+                                        onChange={(e) => setUserName(e.target.value)}
+                                        placeholder="Username"
+                                        className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                                    />
+                                </div>
                             </div>
 
                             <div>
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        Role
-                                    </span>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    Email Address
                                 </label>
-
-                                <input
-                                    type="text"
-                                    value={authUser?.role || ""}
-                                    className="input input-bordered w-full capitalize"
-                                    readOnly
-                                />
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <FaEnvelope className="text-xs" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Email Address"
+                                        className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                                    />
+                                </div>
                             </div>
-
-                            <div>
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        Status
-                                    </span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    value={authUser?.is_active ? "Active" : "Inactive"}
-                                    className="input input-bordered w-full"
-                                    readOnly
-                                />
-                            </div>
-
                         </div>
 
-                        {/* Update Button */}
-                        <div className="flex justify-end mt-6">
+                        {/* Read-Only Account Metadata */}
+                        <div className="pt-4 border-t border-slate-100">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                                Account Metadata & Status
+                            </h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                    <span className="text-[11px] font-medium text-slate-400 block">User ID</span>
+                                    <span className="text-xs font-bold text-slate-800 font-mono">
+                                        #{authUser?.id || "N/A"}
+                                    </span>
+                                </div>
+
+                                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                    <span className="text-[11px] font-medium text-slate-400 block">Role</span>
+                                    <span className="text-xs font-bold text-slate-800 capitalize">
+                                        {authUser?.role || "Customer"}
+                                    </span>
+                                </div>
+
+                                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                                    <span className="text-[11px] font-medium text-slate-400 block">Account Status</span>
+                                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                                        <FaCheckCircle className="text-[10px]" />
+                                        Active
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Save Changes Button */}
+                        <div className="flex justify-end pt-2">
                             <button
-                                onClick={handleUpdateUser}
-                                className="btn btn-primary px-8"
+                                type="submit"
+                                disabled={saving}
+                                className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:bg-blue-400 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center gap-2"
                             >
-                                Update Profile
+                                {saving ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-xs"></span>
+                                        <span>Saving Changes...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaSave />
+                                        <span>Save Changes</span>
+                                    </>
+                                )}
                             </button>
                         </div>
 
                     </form>
                 </div>
+
             </div>
         </div>
     );

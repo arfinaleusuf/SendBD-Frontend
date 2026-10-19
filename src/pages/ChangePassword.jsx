@@ -2,155 +2,177 @@ import { useContext, useState } from "react";
 import { baseurl } from "../services/BaseUrl";
 import { AuthContext } from "../context/AuthProvider";
 import toast from "react-hot-toast";
-import { FaLock, FaShieldAlt, FaKey } from "react-icons/fa";
+import { FaLock, FaShieldAlt, FaKey, FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link } from "react-router";
 
 const ChangePassword = () => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
-    const { accessToken } = useContext(AuthContext)
+    const [showCurrent, setShowCurrent] = useState(false);
+    const [showNew, setShowNew] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handlePasswordChange = async () => {
+    const { accessToken } = useContext(AuthContext);
+
+    const handlePasswordChange = async (e) => {
+        if (e) e.preventDefault();
+        if (!currentPassword || !newPassword) {
+            toast.error("Please fill in both fields");
+            return;
+        }
 
         const formdata = {
             current_password: currentPassword,
-            new_password: newPassword
-        }
+            new_password: newPassword,
+        };
 
-        const res = await fetch(`${baseurl}/passwordChange`, {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify(formdata)
-        })
-        const data = await res.json();
-        console.log(data)
-        toast(data?.message || data?.detail)
-    }
+        try {
+            setLoading(true);
+            const res = await fetch(`${baseurl}/passwordChange`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify(formdata),
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data?.detail || data?.message || "Failed to change password");
+                return;
+            }
+
+            toast.success(data?.message || "Password updated successfully!");
+            setCurrentPassword("");
+            setNewPassword("");
+        } catch (err) {
+            console.error(err);
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-base-200 px-4 py-8 sm:px-6 lg:px-8">
-
-            <div className="mx-auto flex w-full max-w-xl flex-col items-center">
-
+        <div className="min-h-screen bg-slate-50 pt-24 pb-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+            <div className="w-full max-w-lg space-y-6">
+                
                 {/* Header */}
-                <div className="mb-6 w-full text-center">
-
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-content shadow-lg sm:h-16 sm:w-16">
-                        <FaShieldAlt className="text-xl sm:text-2xl" />
+                <div className="text-center space-y-2">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mx-auto shadow-sm">
+                        <FaShieldAlt />
                     </div>
-
-                    <h1 className="text-2xl font-bold sm:text-3xl">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                         Change Password
                     </h1>
-
-                    <p className="mt-2 px-2 text-sm text-base-content/60 sm:text-base">
-                        Keep your account secure by updating your password
+                    <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
+                        Protect your account by regularly updating to a strong, unique password.
                     </p>
-
                 </div>
 
-
                 {/* Card */}
-                <div className="w-full rounded-2xl border border-base-300 bg-base-100 shadow-xl">
-
-                    <div className="p-5 sm:p-7 md:p-8">
-
-                        {/* Security Info */}
-                        <div className="mb-6 flex w-full items-start gap-3 rounded-xl bg-primary/10 p-4">
-
-                            <FaLock className="mt-1 shrink-0 text-primary" />
-
-                            <div className="min-w-0">
-
-                                <p className="font-semibold">
-                                    Password Security
-                                </p>
-
-                                <p className="mt-1 text-xs leading-5 text-base-content/60 sm:text-sm">
-                                    Choose a strong password that you don't
-                                    use anywhere else.
-                                </p>
-
-                            </div>
-
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xl shadow-slate-200/50 space-y-6">
+                    
+                    {/* Security Tip Box */}
+                    <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 flex items-start gap-3 text-xs text-blue-900 leading-relaxed">
+                        <FaLock className="text-blue-500 mt-0.5 shrink-0" />
+                        <div>
+                            <span className="font-bold">Password Security:</span> Use at least 8 characters with a mix of letters, numbers, and symbols.
                         </div>
+                    </div>
 
-
+                    <form onSubmit={handlePasswordChange} className="space-y-4">
+                        
                         {/* Current Password */}
-                        <div className="form-control w-full">
-
-                            <label className="mb-2 block">
-                                <span className="text-sm font-medium">
-                                    Current Password
-                                </span>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                Current Password
                             </label>
-
-                            <label className="input input-bordered flex h-12 w-full items-center gap-3 focus-within:input-primary">
-
-                                <FaLock className="shrink-0 text-base-content/40" />
-
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <FaLock className="text-xs" />
+                                </div>
                                 <input
-                                    type="password"
-                                    placeholder="Enter your current password"
-                                    className="min-w-0 w-full bg-transparent outline-none"
+                                    type={showCurrent ? "text" : "password"}
                                     value={currentPassword}
-                                    onChange={(e) =>
-                                        setCurrentPassword(e.target.value)
-                                    }
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    placeholder="Enter current password"
+                                    required
+                                    className="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                 />
-
-                            </label>
-
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCurrent(!showCurrent)}
+                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
+                                >
+                                    {showCurrent ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            </div>
                         </div>
-
 
                         {/* New Password */}
-                        <div className="form-control mt-5 w-full">
-
-                            <label className="mb-2 block">
-                                <span className="text-sm font-medium">
-                                    New Password
-                                </span>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                New Password
                             </label>
-
-                            <label className="input input-bordered flex h-12 w-full items-center gap-3 focus-within:input-primary">
-
-                                <FaKey className="shrink-0 text-base-content/40" />
-
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <FaKey className="text-xs" />
+                                </div>
                                 <input
-                                    type="password"
-                                    placeholder="Enter your new password"
-                                    className="min-w-0 w-full bg-transparent outline-none"
+                                    type={showNew ? "text" : "password"}
                                     value={newPassword}
-                                    onChange={(e) =>
-                                        setNewPassword(e.target.value)
-                                    }
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="Enter new strong password"
+                                    required
+                                    className="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                 />
-
-                            </label>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNew(!showNew)}
+                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
+                                >
+                                    {showNew ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            </div>
                         </div>
 
+                        {/* Submit Button */}
+                        <div className="pt-2">
+                            <button
+                                type="submit"
+                                disabled={!currentPassword || !newPassword || loading}
+                                className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] disabled:bg-blue-400 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                        <span>Updating Password...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaLock />
+                                        <span>Update Password</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
 
-                        {/* Button */}
-                        <button
-                            onClick={handlePasswordChange}
-                            disabled={
-                                !currentPassword || !newPassword
-                            }
-                            className="btn btn-primary mt-6 h-12 w-full"
+                    </form>
+
+                    <div className="pt-2 text-center">
+                        <Link
+                            to="/user/profile"
+                            className="text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"
                         >
-                            <FaLock />
-                            Change Password
-                        </button>
-
+                            ← Back to Profile
+                        </Link>
                     </div>
 
                 </div>
 
             </div>
-
         </div>
     );
 };

@@ -14,32 +14,37 @@ const AuthProvider = ({ children }) => {
         setAuthUser(null)
     }
 
-    const fetchUser = async () => {
-        const userRes = await fetch(`${baseurl}/user`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
-
-        if (userRes.status === 401 || !userRes.ok) {
-            logout();
-            return;
-        }
-
-        const userData = await userRes.json();
-
-        setAuthUser(userData);
-        setLoading(false);
-    };
-
     useEffect(() => {
         if (!accessToken) {
             setAuthUser(null);
-            setLoading(false)
+            setLoading(false);
             return;
         }
+
+        const fetchUser = async () => {
+            try {
+                const userRes = await fetch(`${baseurl}/user`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+                });
+
+                if (userRes.status === 401 || !userRes.ok) {
+                    logout();
+                    return;
+                }
+
+                const userData = await userRes.json();
+                setAuthUser(userData);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchUser();
-    }, [accessToken])
+    }, [accessToken]);
 
 
     return (

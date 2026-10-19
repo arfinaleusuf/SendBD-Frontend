@@ -4,7 +4,6 @@ import { FaEnvelope, FaLock, FaKey, FaArrowLeft } from "react-icons/fa";
 import { baseurl } from "../services/BaseUrl";
 import { Link } from "react-router";
 
-
 const ForgetPassword = () => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
@@ -24,9 +23,9 @@ const ForgetPassword = () => {
             const res = await fetch(`${baseurl}/forgot-password`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email })
+                body: JSON.stringify({ email: email.trim() }),
             });
 
             const data = await res.json();
@@ -35,9 +34,8 @@ const ForgetPassword = () => {
                 throw new Error(data?.detail || "Failed to send OTP");
             }
 
-            toast.success("OTP sent to your email");
+            toast.success("OTP sent to your email address!");
             setStep(2);
-
         } catch (error) {
             toast.error(error.message);
         } finally {
@@ -47,7 +45,7 @@ const ForgetPassword = () => {
 
     const handleVerifyOTP = async () => {
         if (!otp) {
-            toast.error("Please enter OTP");
+            toast.error("Please enter the 6-digit OTP");
             return;
         }
 
@@ -57,19 +55,19 @@ const ForgetPassword = () => {
             const res = await fetch(`${baseurl}/verify-otp`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email,
-                    otp
-                })
+                    email: email.trim(),
+                    otp: otp.trim(),
+                }),
             });
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data?.detail || "Invalid OTP");
+                throw new Error(data?.detail || "Invalid or expired OTP");
             }
-            toast.success("OTP verified successfully");
+            toast.success("OTP verified successfully!");
             setStep(3);
         } catch (error) {
             toast.error(error.message);
@@ -93,19 +91,19 @@ const ForgetPassword = () => {
             const res = await fetch(`${baseurl}/reset-password`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email,
-                    otp,
-                    new_password: newPassword
-                })
+                    email: email.trim(),
+                    otp: otp.trim(),
+                    new_password: newPassword,
+                }),
             });
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data?.detail || "Password reset failed");
             }
-            toast.success("Password reset successfully");
+            toast.success("Password reset successfully! Please log in.");
             setEmail("");
             setOtp("");
             setNewPassword("");
@@ -121,280 +119,227 @@ const ForgetPassword = () => {
     };
 
     return (
-        <div className="min-h-[85vh] flex items-center justify-center px-4 py-10 bg-base-200">
-
-            <div className="w-full max-w-md">
-
+        <div className="min-h-screen bg-slate-50 pt-24 pb-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+            <div className="w-full max-w-md space-y-6">
+                
                 {/* Header */}
-                <div className="text-center mb-6">
-
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        {step === 1 && <FaEnvelope className="text-2xl" />}
-                        {step === 2 && <FaKey className="text-2xl" />}
-                        {step === 3 && <FaLock className="text-2xl" />}
+                <div className="text-center space-y-2">
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mx-auto shadow-sm">
+                        {step === 1 && <FaEnvelope />}
+                        {step === 2 && <FaKey />}
+                        {step === 3 && <FaLock />}
                     </div>
 
-                    <h1 className="text-3xl font-bold">
-                        {step === 1 && "Forgot Password?"}
-                        {step === 2 && "Verify OTP"}
-                        {step === 3 && "Reset Password"}
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        {step === 1 && "Reset Your Password"}
+                        {step === 2 && "Enter OTP Verification"}
+                        {step === 3 && "Set New Password"}
                     </h1>
 
-                    <p className="text-base-content/60 mt-2">
-                        {step === 1 && "Enter your email to receive a verification code."}
-                        {step === 2 && "Enter the OTP sent to your email address."}
-                        {step === 3 && "Create a new password for your account."}
+                    <p className="text-xs sm:text-sm text-slate-500 max-w-xs mx-auto">
+                        {step === 1 && "Enter your registered email to receive a secure recovery code."}
+                        {step === 2 && "We sent a 6-digit verification code to your email."}
+                        {step === 3 && "Choose a new strong password for your SendBD account."}
                     </p>
-
                 </div>
 
-
-                {/* Progress */}
-                <div className="flex items-center justify-center gap-2 mb-6">
-
-                    <div
-                        className={`h-2 w-20 rounded-full ${
-                            step >= 1 ? "bg-primary" : "bg-base-300"
-                        }`}
-                    />
-
-                    <div
-                        className={`h-2 w-20 rounded-full ${
-                            step >= 2 ? "bg-primary" : "bg-base-300"
-                        }`}
-                    />
-
-                    <div
-                        className={`h-2 w-20 rounded-full ${
-                            step >= 3 ? "bg-primary" : "bg-base-300"
-                        }`}
-                    />
-
+                {/* Progress Indicator */}
+                <div className="flex items-center justify-center gap-2">
+                    {[1, 2, 3].map((s) => (
+                        <div
+                            key={s}
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                                step === s
+                                    ? "w-12 bg-blue-600"
+                                    : step > s
+                                    ? "w-8 bg-emerald-500"
+                                    : "w-8 bg-slate-200"
+                            }`}
+                        />
+                    ))}
                 </div>
-
 
                 {/* Card */}
-                <div className="card bg-base-100 shadow-xl border border-base-300">
-
-                    <div className="card-body">
-
-                        {/* ================= STEP 1 ================= */}
-                        {step === 1 && (
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSendOTP();
-                                }}
-                            >
-
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        Email Address
-                                    </span>
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xl shadow-slate-200/50 space-y-6">
+                    
+                    {/* STEP 1: Enter Email */}
+                    {step === 1 && (
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSendOTP();
+                            }}
+                            className="space-y-4"
+                        >
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    Registered Email Address
                                 </label>
-
                                 <div className="relative">
-
-                                    <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" />
-
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <FaEnvelope className="text-xs" />
+                                    </div>
                                     <input
                                         type="email"
-                                        placeholder="Enter your registered email"
-                                        className="input input-bordered w-full pl-11"
+                                        placeholder="name@example.com"
                                         value={email}
-                                        onChange={(e) =>
-                                            setEmail(e.target.value)
-                                        }
+                                        onChange={(e) => setEmail(e.target.value)}
                                         required
+                                        className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                     />
-
                                 </div>
+                            </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="btn btn-primary w-full mt-6"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="loading loading-spinner loading-sm"></span>
-                                            Sending OTP...
-                                        </>
-                                    ) : (
-                                        "Send OTP"
-                                    )}
-                                </button>
-
-                            </form>
-                        )}
-
-
-                        {/* ================= STEP 2 ================= */}
-                        {step === 2 && (
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleVerifyOTP();
-                                }}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] disabled:bg-blue-400 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
                             >
+                                {loading ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                        <span>Sending OTP Code...</span>
+                                    </>
+                                ) : (
+                                    <span>Send Verification Code</span>
+                                )}
+                            </button>
+                        </form>
+                    )}
 
-                                <div className="text-center mb-5">
+                    {/* STEP 2: Verify OTP */}
+                    {step === 2 && (
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleVerifyOTP();
+                            }}
+                            className="space-y-5"
+                        >
+                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
+                                <span className="text-[11px] text-slate-400 block">Code sent to:</span>
+                                <span className="text-xs font-bold text-slate-800">{email}</span>
+                            </div>
 
-                                    <p className="text-sm text-base-content/60">
-                                        OTP sent to
-                                    </p>
-
-                                    <p className="font-semibold mt-1">
-                                        {email}
-                                    </p>
-
-                                </div>
-
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        Verification Code
-                                    </span>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5 text-center">
+                                    Enter 6-Digit OTP
                                 </label>
-
                                 <input
                                     type="text"
                                     inputMode="numeric"
                                     maxLength="6"
-                                    placeholder="Enter 6 digit OTP"
-                                    className="input input-bordered w-full text-center text-2xl tracking-[8px] font-bold"
+                                    placeholder="• • • • • •"
                                     value={otp}
-                                    onChange={(e) =>
-                                        setOtp(
-                                            e.target.value.replace(
-                                                /\D/g,
-                                                ""
-                                            )
-                                        )
-                                    }
+                                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                                     required
+                                    className="w-full py-3 text-center text-2xl tracking-[12px] font-mono font-bold bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                 />
+                            </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="btn btn-primary w-full mt-6"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="loading loading-spinner loading-sm"></span>
-                                            Verifying...
-                                        </>
-                                    ) : (
-                                        "Verify OTP"
-                                    )}
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(1)}
-                                    className="btn btn-ghost w-full mt-2"
-                                >
-                                    Change Email
-                                </button>
-
-                            </form>
-                        )}
-
-
-                        {/* ================= STEP 3 ================= */}
-                        {step === 3 && (
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleResetPassword();
-                                }}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] disabled:bg-blue-400 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
                             >
+                                {loading ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                        <span>Verifying...</span>
+                                    </>
+                                ) : (
+                                    <span>Verify OTP</span>
+                                )}
+                            </button>
 
-                                <label className="label">
-                                    <span className="label-text font-semibold">
-                                        New Password
-                                    </span>
+                            <button
+                                type="button"
+                                onClick={() => setStep(1)}
+                                className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+                            >
+                                Change email address
+                            </button>
+                        </form>
+                    )}
+
+                    {/* STEP 3: Reset Password */}
+                    {step === 3 && (
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleResetPassword();
+                            }}
+                            className="space-y-4"
+                        >
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    New Password
                                 </label>
-
                                 <div className="relative">
-
-                                    <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" />
-
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <FaLock className="text-xs" />
+                                    </div>
                                     <input
                                         type="password"
                                         placeholder="Enter new password"
-                                        className="input input-bordered w-full pl-11"
                                         value={newPassword}
-                                        onChange={(e) =>
-                                            setNewPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setNewPassword(e.target.value)}
                                         required
+                                        className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                     />
-
                                 </div>
+                            </div>
 
-
-                                <label className="label mt-2">
-                                    <span className="label-text font-semibold">
-                                        Confirm Password
-                                    </span>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    Confirm New Password
                                 </label>
-
                                 <div className="relative">
-
-                                    <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" />
-
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <FaLock className="text-xs" />
+                                    </div>
                                     <input
                                         type="password"
                                         placeholder="Confirm new password"
-                                        className="input input-bordered w-full pl-11"
                                         value={confirmPassword}
-                                        onChange={(e) =>
-                                            setConfirmPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
+                                        className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                     />
-
                                 </div>
+                            </div>
 
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] disabled:bg-blue-400 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="loading loading-spinner loading-sm"></span>
+                                        <span>Resetting Password...</span>
+                                    </>
+                                ) : (
+                                    <span>Reset Password & Finish</span>
+                                )}
+                            </button>
+                        </form>
+                    )}
 
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="btn btn-primary w-full mt-6"
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="loading loading-spinner loading-sm"></span>
-                                            Resetting...
-                                        </>
-                                    ) : (
-                                        "Reset Password"
-                                    )}
-                                </button>
-
-                            </form>
-                        )}
-
-                    </div>
                 </div>
 
-
-                {/* Back to Login */}
-                <div className="text-center mt-6">
-
+                {/* Back to Login Link */}
+                <div className="text-center">
                     <Link
                         to="/login"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors"
                     >
                         <FaArrowLeft />
-                        Back to Login
+                        <span>Return to Sign In</span>
                     </Link>
-
                 </div>
 
             </div>
-
         </div>
     );
 };
